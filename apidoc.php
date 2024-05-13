@@ -152,19 +152,17 @@ switch ($requestParamsType) {
         $requestDemoType = 'json';
         $data            = json_decode($inputParams);
         if (!$data) {
-            exit('Request params error json format!');
+            $requestParamsMd = generateJsonParamsMd($data);
         }
-        $requestParamsMd = generateJsonParamsMd($data);
         break;
     default:
         exit('error request params type');
 }
 
 $jsonResponseData = json_decode($responseData);
-if (!$jsonResponseData) {
-    exit('Response data error json format!');
+if ($jsonResponseData) {
+    $responseDataMd = generateJsonParamsMd($jsonResponseData);
 }
-$responseDataMd = generateJsonParamsMd($jsonResponseData);
 
 echo sprintf(
     $md,
