@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation Generator</title>
+    <!-- 引入Bootstrap样式 -->
+    <link rel="stylesheet" href="./bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-3 text-center">API Documentation Generator</h2>
+        <div class="row mt-4">
+            <!-- 左侧模块 -->
+            <div class="col-lg-6">
+                <h4>Api Name</h4>
+                <input type="text" id="apiName" class="form-control">
+                <h4>Api Url</h4>
+                <input type="text" id="apiUrl" class="form-control">
+                <h4>Method</h4>
+                <select id="requestMethod" class="form-control">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="PATCH">PATCH</option>
+                </select>
+                <h4>Request Header</h4>
+                <textarea id="requestHeader" class="form-control" rows="6" placeholder="Example,
+Accept:application/prs.CRM-Back-End.v2+json
+Content-type:application/json"></textarea>
+                <h4>Request Parameters Type</h4>
+                <select id="requestParamsType" class="form-control">
+                    <option value="1">Uri</option>
+                    <option value="2">Form-Data</option>
+                    <option value="3">Json</option>
+                </select>
+                <h4>Request Parameters</h4>
+                <textarea id="requestParams" class="form-control" rows="6" placeholder="Enter input parameters"></textarea>
+                <h4 class="mt-3">Response Data</h4>
+                <textarea id="responseData" class="form-control" rows="6" placeholder="Enter output parameters"></textarea>
+                <button class="btn btn-primary mt-3" onclick="generateMarkdown()">Generate Markdown</button>
+            </div>
+            
+            <!-- 右侧模块 -->
+            <div class="col-lg-6">
+                <h4>Markdown Preview</h4>
+                <textarea id="markdownPreview" class="form-control" rows="38"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入Bootstrap的JavaScript文件 -->
+    <script src="./jquery-3.7.1.min.js"></script>
+    <script src="./popper.min.js"></script>
+    <script src="./bootstrap.min.js"></script>
+
+    <script>
+        // 解析输入的参数并生成对应的输入框
+        function generateMarkdown() {
+            const apiName = document.getElementById('apiName').value.trim();
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const requestMethod = document.getElementById('requestMethod').value.trim();
+            const requestHeader = document.getElementById('requestHeader').value.trim();
+            const requestParamsType = document.getElementById('requestParamsType').value.trim();
+            const requestParams = document.getElementById('requestParams').value.trim();
+            const responseData = document.getElementById('responseData').value.trim();
+            $.post(
+                "http://127.0.0.1/apidoc.php",
+                {
+                    api_name: apiName,
+                    api_url: apiUrl,
+                    request_method: requestMethod,
+                    request_header: requestHeader,
+                    request_params_type: requestParamsType,
+                    request_params: requestParams,
+                    response_data: responseData
+                },
+                function (res) {
+                    document.getElementById('markdownPreview').innerHTML = res;
+                }
+            );
+            // $.ajax({
+            //     type: "POST",
+            //     url: "http://127.0.0.1/apidoc.php",
+            //     data: {
+            //         request_params_type: requestParamsType,
+            //         request_params: requestParams,
+            //         response_data: responseData
+            //     },
+            //     dataType: "JSON",
+            //     success: function (res) {
+            //         document.getElementById('markdownPreview').text(res);
+            //         console.log(document.getElementById('markdownPreview'));
+            //     }
+            // });
+        }
+
+    </script>
+</body>
+</html>
