@@ -193,8 +193,8 @@ function generateJsonParamsMd($value, $key = '', $prefix = ''): string
     $output     = '';
     $paramsName = substr($prefix, 1) . $key;
     if (is_object($value)) {
-        if (!empty($key)) {
-            $output .= "|$prefix$key|object|Y|||\n";
+        if (!empty($paramsName)) {
+            $output .= "|$paramsName|object|Y|||\n";
         }
         foreach ($value as $subKey => $subItem) {
             $output .= generateJsonParamsMd($subItem, $subKey, trim($prefix) . '- ');
