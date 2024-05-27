@@ -49,7 +49,7 @@ $jsonString = '{
     },
     "g": [
         {
-            "g_1": 1,
+            "g_1": 1,r
             "g_2": "aaaa"
         },
         {
@@ -188,6 +188,14 @@ function generateRequestParamsMarkdown($key, $value): string
     return "|$key|$type|Y||$value|\n";
 }
 
+function getBooleanValue($value)
+{
+    if ($value) {
+        return "true";
+    }
+    return "false";
+}
+
 function generateJsonParamsMd($value, $key = '', $prefix = ''): string
 {
     $output     = '';
@@ -200,7 +208,7 @@ function generateJsonParamsMd($value, $key = '', $prefix = ''): string
             $output .= generateJsonParamsMd($subItem, $subKey, trim($prefix) . '- ');
         }
     } elseif (is_array($value)) {
-        $firstItem = current($value);
+        $firstItem = array_shift($value);
         if (is_object($firstItem)) {
             $output .= "|$paramsName|array(object)|Y|||\n";
             foreach ($firstItem as $subKey => $subItem) {
@@ -213,6 +221,8 @@ function generateJsonParamsMd($value, $key = '', $prefix = ''): string
             $output .= "|$paramsName|array(string)|Y||$firstItem|\n";
         } elseif (is_numeric($firstItem)) {
             $output .= "|$paramsName|array(number)|Y||$firstItem|\n";
+        } elseif (is_bool($firstItem)) {
+            $output .= "|$paramsName|array(boolean)|Y||" . getBooleanValue($firstItem) . "|\n";
         } else {
             $output .= "|$paramsName|array()|Y||[]|\n";
         }
@@ -220,6 +230,8 @@ function generateJsonParamsMd($value, $key = '', $prefix = ''): string
         $output .= "|$paramsName|string|Y||$value|\n";
     } elseif (is_numeric($value)) {
         $output .= "|$paramsName|number|Y||$value|\n";
+    } elseif (is_bool($value)) {
+        $output .= "|$paramsName|boolean|Y||" . getBooleanValue($value) . "|\n";
     }
     return $output;
 }
