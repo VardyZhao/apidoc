@@ -151,7 +151,7 @@ switch ($requestParamsType) {
     case 3:
         $requestDemoType = 'json';
         $data            = json_decode($inputParams);
-        if (!$data) {
+        if ($data) {
             $requestParamsMd = generateJsonParamsMd($data);
         }
         break;
