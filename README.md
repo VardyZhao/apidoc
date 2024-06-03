@@ -16,5 +16,6 @@ Just like this.
 完事。
 Done.
 
-![image](https://github.com/VardyZhao/apidoc/assets/22736880/5b61dc9b-79eb-4a0c-a9b5-8b305bec09fa)
+![image](https://github.com/VardyZhao/apidoc/assets/22736880/bcda2d45-59f8-4f4e-b6b1-1785323892b3)
+
 
