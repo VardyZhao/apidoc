@@ -13,6 +13,9 @@ Enter your api information and click generate markdown.
 就像这样。
 Just like this.
 
+完了会在apidoc.php的同级目录下生成md目录，里面会保存markdown文件。
+After that, an md directory will be generated under the same directory as apidoc.php, and the markdown file will be stored in it.
+
 完事。
 Done.
 
