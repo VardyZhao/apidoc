@@ -93,21 +93,23 @@ $md = '
 - method: %s
 %s
 - 请求参数
-  |参数名|类型|是否必填|说明|示例|
-  |--|--|--|--|--|
-  %s
+
+|参数名|类型|是否必填|说明|示例|
+|--|--|--|--|--|
+%s
 - 请求参数示例
-  ```%s
-  %s
-  ```
+```%s
+%s
+```
 - 返回参数
-  |参数名|类型|是否必填|说明|示例|
-  |--|--|--|--|--|
-  %s
+
+|参数名|类型|是否必填|说明|示例|
+|--|--|--|--|--|
+%s
 - 返回示例
-  ```json
-  %s
-  ```
+```json
+%s
+```
 ';
 
 $apiName           = $_POST['api_name'] ?? '';
@@ -125,8 +127,9 @@ $responseDataMd  = '';
 
 $requestHeaderMd = '
 - 请求头
-  |参数名|是否必填|值|说明|
-  |--|--|--|--|
+
+|参数名|是否必填|值|说明|
+|--|--|--|--|
 ';
 if (!empty($requestHeader)) {
     foreach (explode("\n", $requestHeader) as $headerItem) {
@@ -164,7 +167,7 @@ if ($jsonResponseData) {
     $responseDataMd = generateJsonParamsMd($jsonResponseData);
 }
 
-echo sprintf(
+$fileContent = sprintf(
     $md,
     $apiName,
     $apiUrl,
@@ -177,15 +180,27 @@ echo sprintf(
     $responseData
 );
 
+$dir = __DIR__ . '/md/';
+if (!is_dir($dir)) {
+    mkdir($dir, 0777);
+}
+$filename = '';
+$tmp      = explode('/', $apiUrl);
+foreach ($tmp as $str) {
+    $filename .= ucfirst($str);
+}
+file_put_contents($dir . $filename . '.md', $fileContent);
+echo $fileContent;
+
 function generateRequestHeaderMarkdown($key, $value): string
 {
-    return "|$key|Y|$value|||\n";
+    return "|$key|Y|$value| | |\n";
 }
 
 function generateRequestParamsMarkdown($key, $value): string
 {
     $type = gettype($value);
-    return "|$key|$type|Y||$value|\n";
+    return "|$key|$type|Y| |$value|\n";
 }
 
 function getBooleanValue($value)
@@ -202,7 +217,7 @@ function generateJsonParamsMd($value, $key = '', $prefix = ''): string
     $paramsName = substr($prefix, 1) . $key;
     if (is_object($value)) {
         if (!empty($paramsName)) {
-            $output .= "|$paramsName|object|Y|||\n";
+            $output .= "|$paramsName|object|Y| | |\n";
         }
         foreach ($value as $subKey => $subItem) {
             $output .= generateJsonParamsMd($subItem, $subKey, trim($prefix) . '- ');
@@ -210,28 +225,28 @@ function generateJsonParamsMd($value, $key = '', $prefix = ''): string
     } elseif (is_array($value)) {
         $firstItem = array_shift($value);
         if (is_object($firstItem)) {
-            $output .= "|$paramsName|array(object)|Y|||\n";
+            $output .= "|$paramsName|array(object)|Y| | |\n";
             foreach ($firstItem as $subKey => $subItem) {
                 $output .= generateJsonParamsMd($subItem, $subKey, trim($prefix) . '- ');
             }
         } elseif (is_array($firstItem)) {
-            $output .= "|$paramsName|array(array)|Y|||\n";
+            $output .= "|$paramsName|array(array)|Y| | |\n";
             $output .= generateJsonParamsMd($firstItem, $key, trim($prefix) . '- ');
         } elseif (is_string($firstItem)) {
-            $output .= "|$paramsName|array(string)|Y||$firstItem|\n";
+            $output .= "|$paramsName|array(string)|Y| |$firstItem|\n";
         } elseif (is_numeric($firstItem)) {
-            $output .= "|$paramsName|array(number)|Y||$firstItem|\n";
+            $output .= "|$paramsName|array(number)|Y| |$firstItem|\n";
         } elseif (is_bool($firstItem)) {
-            $output .= "|$paramsName|array(boolean)|Y||" . getBooleanValue($firstItem) . "|\n";
+            $output .= "|$paramsName|array(boolean)|Y| |" . getBooleanValue($firstItem) . "|\n";
         } else {
-            $output .= "|$paramsName|array()|Y||[]|\n";
+            $output .= "|$paramsName|array()|Y| |[]|\n";
         }
     } elseif (is_string($value)) {
-        $output .= "|$paramsName|string|Y||$value|\n";
+        $output .= "|$paramsName|string|Y| |$value|\n";
     } elseif (is_numeric($value)) {
-        $output .= "|$paramsName|number|Y||$value|\n";
+        $output .= "|$paramsName|number|Y| |$value|\n";
     } elseif (is_bool($value)) {
-        $output .= "|$paramsName|boolean|Y||" . getBooleanValue($value) . "|\n";
+        $output .= "|$paramsName|boolean|Y| |" . getBooleanValue($value) . "|\n";
     }
     return $output;
 }
