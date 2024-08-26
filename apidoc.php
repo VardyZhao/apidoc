@@ -92,15 +92,12 @@ $md = '
 - 接口：%s
 - method: %s
 %s
-- 请求参数
+%s
+- 响应
 
-|参数名|类型|是否必填|说明|示例|
-|--|--|--|--|--|
-%s
-- 请求参数示例
-```%s
-%s
-```
+|Http Code|说明|
+|--|--|
+|200|success|
 - 返回参数
 
 |参数名|类型|是否必填|说明|示例|
@@ -110,6 +107,11 @@ $md = '
 ```json
 %s
 ```
+- 错误码
+
+|code|中文|English|
+|--|--|--|
+| | | |
 ';
 
 $apiName           = $_POST['api_name'] ?? '';
@@ -131,6 +133,19 @@ $requestHeaderMd = '
 |参数名|是否必填|值|说明|
 |--|--|--|--|
 ';
+
+$requestParamsMd = '
+- 请求参数
+
+|参数名|类型|是否必填|说明|示例|
+|--|--|--|--|--|
+%s
+- 请求参数示例
+```%s
+%s
+```
+';
+
 if (!empty($requestHeader)) {
     foreach (explode("\n", $requestHeader) as $headerItem) {
         $tmpItem         = explode(':', $headerItem);
@@ -138,29 +153,37 @@ if (!empty($requestHeader)) {
     }
 }
 
+$tmpRequestMd = '';
 switch ($requestParamsType) {
     case 1:
         foreach (explode('&', $inputParams) as $item) {
-            $tmpItem         = explode('=', $item);
-            $requestParamsMd .= generateRequestParamsMarkdown($tmpItem[0] ?? '', $tmpItem[1] ?? '');
+            $tmpItem      = explode('=', $item);
+            $tmpRequestMd .= generateRequestParamsMarkdown($tmpItem[0] ?? '', $tmpItem[1] ?? '');
         }
         break;
     case 2:
         foreach (explode("\n", $inputParams) as $item) {
-            $tmpItem         = explode(':', $item);
-            $requestParamsMd .= generateRequestParamsMarkdown($tmpItem[0] ?? '', $tmpItem[1] ?? '');
+            $tmpItem      = explode(':', $item);
+            $tmpRequestMd .= generateRequestParamsMarkdown($tmpItem[0] ?? '', $tmpItem[1] ?? '');
         }
         break;
     case 3:
         $requestDemoType = 'json';
         $data            = json_decode($inputParams);
         if ($data) {
-            $requestParamsMd = generateJsonParamsMd($data);
+            $tmpRequestMd = generateJsonParamsMd($data);
         }
         break;
     default:
         exit('error request params type');
 }
+
+if (!empty($inputParams)) {
+    $requestParamsMd = sprintf($requestParamsMd, $tmpRequestMd, $requestDemoType, $inputParams);
+} else {
+    $requestParamsMd = '';
+}
+
 
 $jsonResponseData = json_decode($responseData);
 if ($jsonResponseData) {
@@ -174,8 +197,6 @@ $fileContent = sprintf(
     $requestMethod,
     $requestHeaderMd,
     $requestParamsMd,
-    $requestDemoType,
-    $inputParams,
     $responseDataMd,
     $responseData
 );
@@ -203,7 +224,7 @@ function generateRequestParamsMarkdown($key, $value): string
     return "|$key|$type|Y| |$value|\n";
 }
 
-function getBooleanValue($value)
+function getBooleanValue($value): string
 {
     if ($value) {
         return "true";
